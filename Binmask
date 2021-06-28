@@ -1,0 +1,44 @@
+''' Binmask '''
+
+print ("Binmask start")
+import os 
+import gdal 
+import numpy as np
+import matplotlib.pyplot
+
+#Import raster
+MyFolder = #Path
+MyImageRoot = #Name
+fileName1 = os.path.join(MyFolder + MyImageRoot)
+ds = gdal.Open (fileName1)
+gt = ds.GetGeoTransform()
+proj = ds.GetProjection()
+band = ds.GetRasterBand(1)
+array = band.ReadAsArray()
+
+#Calculation
+binmask = np.where( (array > 0.0) & (array < 0.2), 1,0 ) #choosing the value to highlights and save as band 1
+
+#Plot
+plt.figure()
+plt.imshow(binmask)
+
+#save new file
+SavedClass = os.path.join(MyFolder + when + 'Binmask.tif')
+driver = gdal.GetDriverByName("GTiff")
+driver.Register()
+outds = driver.Create( SavedClass, xsize = binmask.shape[1], 
+                      ysize = binmask.shape [0], bands = 1, 
+                      eType = gdal.GDT_Int16)
+
+outds.SetGeoTransform(gt)
+outds.SetProjection(proj)
+outband = outds.GetRasterBand(1)
+outband.WriteArray(binmask)
+outband.SetNoDataValue(np.nan)
+outband.FlushCache()
+
+outband = None
+outds = None
+
+print ("Binmaskdone")
