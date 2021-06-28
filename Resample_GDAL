@@ -1,0 +1,27 @@
+import gdal 
+import matplotlib.pyplot as plt
+
+''' resample '''
+
+print ("Resampling")
+#Import raster
+MyFolder = #path
+MyImageRoot = #filename.type
+fileName1 = os.path.join(MyFolder + MyImageRoot)
+ds = gdal.Open (fileName1)
+array = ds.GetRasterBand(1).ReadAsArray()
+
+#output location
+path = r'D:\\Cascata\\'
+output = path + when + "Reclass.tif"
+
+#options
+xres=2 #pixel resolution int
+yres=2
+resample_alg = 'near' #insert the algorithm kind, as near or, bilinear, cubic etc.
+
+#algorithm
+dsRes = gdal.Warp(output, ds, xRes = xres, yRes = yres, resampleAlg = resample_alg)
+array = ds.GetRasterBand(1).ReadAsArray()
+plt.imshow(array)
+print ("Resample done")
