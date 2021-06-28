@@ -1,0 +1,53 @@
+import geopandas as gpd
+import os
+from sentinelsat import SentinelAPI
+
+
+#CREDENTIAL
+user = '' 
+password = '' 
+api = SentinelAPI(user, password, 'https://scihub.copernicus.eu/dhus')
+
+#AREA OF INTEREST
+MyFolder = r'D:\\Iest sampler\\satellite images\\Lipa\\Uncut\\L1C_T33TWK_A020983_20210313T095029_2021-03-13_con\\'
+MyFileRoot = 'AOI.shp'
+fileName = os.path.join(MyFolder + MyFileRoot)
+AOI = gpd.read_file(fileName)
+
+MyFolder = r'D:\Iest sampler\vector\\'
+MyFileRoot = 'Lipa_perimeter.shp'
+fileName = os.path.join(MyFolder + MyFileRoot)
+Perim = gpd.read_file(fileName)
+
+#VISUALIDZE AOI WITH FOLIUM
+import folium 
+
+m = folium.Map([44.701, 16.07], zoom_start=15)
+folium.GeoJson(AOI).add_to(m)
+folium.GeoJson(Perim).add_to(m)
+
+render = m.save("plotting.html")
+
+#COORDINATE TO CUT
+from shapely.geometry import MultiPolygon, Polygon
+
+clipcrs = None
+for i in AOI['geometry']:
+    clipcrs = i
+    
+#FEATURES FOR DOWNLOAD
+products = api.query(clipcrs,#coordinates
+                     date = ('20200101', '20210601'),#timerange
+                     platformname = 'Sentinel-2',#satname
+                     processinglevel = 'Level-2A',
+                     cloudcoverpercentage = (0,40)#cloudrate to insert
+                    )
+  
+#CREATING A LIST
+products_gdf = api.to_geodataframe(products)
+products_gdf_sorted = products_gdf.sort_values(['generationdate'], ascending=[False])
+print (products_gdf_sorted)
+
+#DOWNLOAD COMAND
+print ("start download")
+#api.download('630895cd-93e3-4075-9598-107c36abfd53') #INSERT MANUALLY THE PRODUCT NAME
