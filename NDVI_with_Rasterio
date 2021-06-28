@@ -1,0 +1,26 @@
+print ("Start NVDI")
+
+#folder where the data are located
+Raster = ''
+
+#single file with band, the mand number should be the same as in our variable
+# Open b4 and b8
+b4 = rio.open(Raster+'/')
+b8 = rio.open(Raster+'/')
+b2 = rio.open(Raster+'/')
+
+# read Red(b4) and NIR(b8) as arrays
+red = b4.read()
+nir = b8.read()
+
+# Calculate ndvi
+ndvi = (nir.astype(float)-red.astype(float))/(nir+red)
+
+# Write the NDVI image
+meta = b4.meta
+meta.update(driver='GTiff')
+meta.update(dtype=rio.float32)
+
+with rio.open(when + 'NDVI.tif', 'w', **meta) as dst:
+    dst.write(ndvi.astype(rio.float32))
+print ("NDVI done")
