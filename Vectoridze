@@ -1,0 +1,37 @@
+import os
+import gdal
+import osr
+
+''' Vectoridze '''
+
+print ("Start transformation into vector")
+
+#Import raster
+MyFolder = #path
+MyImageRoot = #filename
+raster_path = os.path.join(MyFolder + MyImageRoot)
+raster = gdal.Open(raster_path)
+band = raster.GetRasterBand(1) 
+
+#set coordinate system
+srs = osr.SpatialReference()
+srs.ImportFromWkt(raster.GetProjectionRef())
+
+path = #where the new file is saved
+#convert into shapefile
+drv = ogr.GetDriverByName('ESRI Shapefile')
+outfile = drv.CreateDataSource('Name.shp') 
+outlayer = outfile.CreateLayer('Name', srs )
+newField = ogr.FieldDefn('DN', ogr.OFTReal)
+outlayer.CreateField(newField)
+
+#algorithm 
+gdal.Polygonize(band, None, outlayer, 0, [], callback=None)
+outfile = None
+
+path = r'D:\\Cascata\\'
+shapefile = gpd.read_file(path + when + 'Lipa.shp')
+shapefile.plot( column= "DN", cmap= "Blues" )
+plt.show()
+
+print ("Vector done")
