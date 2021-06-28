@@ -1,0 +1,28 @@
+import rasterio as rio
+import os
+import geopandas as gpd
+from rasterio.mask import mask
+
+#Clipping
+
+#Insert the shape or geojson file path
+MyFolder = '' #folder
+MyFileRoot = '' #name.type
+fileName = os.path.join(MyFolder + MyFileRoot)
+AOI = gpd.read_file(fileName)
+
+AOI_proj = AOI.to_crs({'init': 'epsg:32633'}) #as the crs of the tiff
+
+#Insert name of the file to clip
+with rio.open('Name.tiff') as src:
+    out_image, out_transform = rio.mask.mask(src,AOI_proj.geometry,crop=True)
+    out_meta = src.meta.copy()
+    out_meta.update({"driver": "GTiff",
+                 "height": out_image.shape[1],
+                 "width": out_image.shape[2],
+                 "transform": out_transform})
+    
+with rio.open('Name_masked.tif', "w", **out_meta) as dest:
+    dest.write(out_image)
+
+print ('Clipping done')
