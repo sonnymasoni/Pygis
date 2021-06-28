@@ -1,0 +1,11 @@
+import geopandas as gpd
+from shapely.geometry import Polygon
+
+data=gpd.read_file('name and path')
+
+polygon = Polygon([(584701.7,4950435.8), (584924.0,4950549.5), (585404.0,4950117.5), (585141.3,4949912.9)]) #insert coordinates (same crs as shapefile)
+ poly_gdf = gpd.GeoDataFrame([1], geometry=[polygon], crs=data.crs)
+ lipaClean = gpd.clip(data, polygon, keep_geom_type=True)
+ lipaClean.to_file('name', driver='GeoJSON') #or ESRI SHAPEFILE as you whish
+ 
+ 
