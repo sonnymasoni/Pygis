@@ -1,0 +1,39 @@
+''' This algorithm provides you to extract and manipulate metadata from sentinel images '''
+''' In this case we extract the data from the sensing date creating a variable "where" to add to the final geo-product'''
+''' That is why in the last part we decide to transform the raw into a datetime variable'''
+
+import pandas as pd
+from bs4 import BeautifulSoup
+
+print ("Collect metadata")
+
+#reading the xml, the file we refer si called MTD.xml and is located in the folder of every Sentinel product
+with open(r'D:\Sentineldata\S2A_MSIL2A_20200422T095031_N0214_R079_T33TWK_20200422T142128.SAFE\GRANULE\L2A_T33TWK_A025244_20200422T095031/MTD_TL.xml', 'r') as f:
+    data = f.read()
+  
+Bs_data = BeautifulSoup(data, 'xml')
+   
+#extract specific data 
+sensing = Bs_data.find('SENSING_TIME') #ask for the data you whant to download
+  
+#convert into a pdDataFrame
+df = pd.DataFrame(sensing)
+
+#save the dataFrame as Csv
+df.to_csv(r'C:\\Users\\sonny\\Desktop\\timestamp.csv')
+
+#call back as df3
+df3 = pd.read_csv(r'C:\\Users\\sonny\\Desktop\\timestamp.csv')
+#create date columns
+df3_rename = df3.rename(columns={"0":"Datetime"})
+#rendering as a date time object
+df3_rename["Datetime"] = pd.to_datetime(df3_rename["Datetime"])
+df3_rename.to_csv(r'C:\\Users\\sonny\\Desktop\\IEST\\timestamp.csv')
+
+#extract metadata
+time = (df3_rename["Datetime"])
+timelipa = time.to_string()
+timelipa = timelipa.replace(" ", "")
+when = timelipa [1:11]
+
+print ("Working on data of " + when)
